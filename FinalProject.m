@@ -1,8 +1,18 @@
 cam = webcam('Logitech');
 oriImage = snapshot(cam);
 Image = oriImage;
-Route = findroute(Image, [350, 10]);    % range for red hue
-imshow(Route);
+RouteImage = findroute(Image, [350, 10]);    % range for red hue
+% imshow(RouteImage*100);
+Route = RouteImage(:, :, 1);
+
+% TODO:
+% drone = [x, y, height, width]     % (0,0) at left-upper side
+
+matchCount_up = matchCount(Route, x, y, height, width, 0);
+matchCount_down = matchCount(Route, x, y+height, height, width, 0);
+matchCount_left = matchCount(Route, x, y, height, width, 1);
+matchCount_right = matchCount(Route, x+width, y, height, width, 1);
+
 
 function I = findroute(image, range)
     % RGB to HSV conversion
@@ -27,5 +37,23 @@ function I = findroute(image, range)
     redChannel = I(:,:,1); % Red channel
     grayChannel = I(:,:,2); % Green channel
     allBlack = zeros(size(I, 1), size(I, 2), 'uint8');
-    I = cat(3, redChannel-grayChannel, allBlack, allBlack)*100;
+    I = cat(3, redChannel-grayChannel, allBlack, allBlack);
 end
+
+function count = matchCount(Route, x, y, height, width, direction)     % 0 for up/down ; 1 for left/right
+   count = 0;
+    if(direction == 0) 
+        for i = 0:width-1
+            if(Route(y, xIi)>0) 
+                count = count + 1; 
+            end
+        end
+    elseif(direction == 1)
+        for i = 0:height-1
+            if(Route(y+i, x)>0)
+                count = Route(y+i, x) + count;
+            end
+        end
+    end
+end
+
