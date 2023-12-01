@@ -1,19 +1,8 @@
 cam = webcam('Logitech');
 oriImage = snapshot(cam);
 Image = oriImage;
-Image = findroute(Image, [350, 10]);
-imshow(Image);
-
-rgbImage = Image;
-redChannel = rgbImage(:,:,1); % Red channel
-greenChannel = rgbImage(:,:,2); % Green channel
-blueChannel = rgbImage(:,:,3); % Blue channel
-
-allBlack = zeros(sigze(rgbImage, 1), size(rgbImage, 2), 'uint8');
-% Create color versions of the individual color channels.
-just_red = cat(3, redChannel-greenChannel, allBlack, allBlack);
-just_green = cat(3, allBlack, greenChannel, allBlack);
-just_blue = cat(3, allBlack, allBlack, blueChannel);
+Route = findroute(Image, [350, 10]);    % range for red hue
+imshow(Route);
 
 function I = findroute(image, range)
     % RGB to HSV conversion
@@ -34,4 +23,9 @@ function I = findroute(image, range)
     I(:,:,2) = mask .* I(:,:,2);
     % HSV to RGB conversion
     I = hsv2rgb(I);
+
+    redChannel = I(:,:,1); % Red channel
+    grayChannel = I(:,:,2); % Green channel
+    allBlack = zeros(size(I, 1), size(I, 2), 'uint8');
+    I = cat(3, redChannel-grayChannel, allBlack, allBlack)*100;
 end
